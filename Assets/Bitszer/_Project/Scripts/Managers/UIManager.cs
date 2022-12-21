@@ -21,6 +21,7 @@ namespace Bitszer
         public Toggle buyToggle;
         public Toggle sellToggle;
         public Toggle myAuctionsToggle;
+        public Toggle myLogsToggle;
 
         [Space]
         [Space]
@@ -34,6 +35,7 @@ namespace Bitszer
         public GameObject bidPopup;
         public GameObject cancelPopup;
         public GameObject searchScrollView;
+        public GameObject logPanel;
 
         [Space]
         [Space]
@@ -41,6 +43,8 @@ namespace Bitszer
         public Transform buyItemPrefab;
         public Transform sellItemParent;
         public Transform sellItemPrefab;
+        public Transform LogItemPrefab;
+        public Transform LogItemParent;
         public Transform auctionItemParent;
         public Transform auctionItemPrefab;
         public Transform similarItemParent;
@@ -50,11 +54,13 @@ namespace Bitszer
         private int _sellItemsLength = 0;
         private int _myAuctionsLength = 0;
         private int _searchItemsLength = 0;
+        private int _logItemsLength = 0;
 
         private bool _isHomeToggleOn = false;
         private bool _isBuyToggleOn = false;
         private bool _isSellToggleOn = false;
         private bool _isMyAuctionsToggleOn = false;
+        private bool _isMyLogsToggleOn = false;
 
         private Profile _profile;
 
@@ -70,6 +76,7 @@ namespace Bitszer
             homeToggle.onValueChanged.AddListener(HomeToggleValueChanged);
             buyToggle.onValueChanged.AddListener(BuyToggleValueChanged);
             sellToggle.onValueChanged.AddListener(SellToggleValueChanged);
+            myLogsToggle.onValueChanged.AddListener(logToggleValueChanged);
             myAuctionsToggle.onValueChanged.AddListener(MyAuctionsToggleValueChanged);
         }
 
@@ -81,6 +88,7 @@ namespace Bitszer
             homeToggle.onValueChanged.RemoveListener(HomeToggleValueChanged);
             buyToggle.onValueChanged.RemoveListener(BuyToggleValueChanged);
             sellToggle.onValueChanged.RemoveListener(SellToggleValueChanged);
+            myLogsToggle.onValueChanged.RemoveListener(logToggleValueChanged);
             myAuctionsToggle.onValueChanged.RemoveListener(MyAuctionsToggleValueChanged);
         }
 
@@ -136,6 +144,7 @@ namespace Bitszer
                     _isBuyToggleOn = false;
                     _isSellToggleOn = false;
                     _isMyAuctionsToggleOn = false;
+                    _isMyLogsToggleOn = false;
 
                     buyItemParent.Clear();
                     sellItemParent.Clear();
@@ -159,6 +168,7 @@ namespace Bitszer
                     _isBuyToggleOn = true;
                     _isSellToggleOn = false;
                     _isMyAuctionsToggleOn = false;
+                    _isMyLogsToggleOn = false;
 
                     sellItemParent.Clear();
                     auctionItemParent.Clear();
@@ -183,6 +193,7 @@ namespace Bitszer
                     _isBuyToggleOn = false;
                     _isSellToggleOn = true;
                     _isMyAuctionsToggleOn = false;
+                    _isMyLogsToggleOn = false;
 
                     buyItemParent.Clear();
                     auctionItemParent.Clear();
@@ -190,6 +201,27 @@ namespace Bitszer
                     GetSellData(10, null);
 
                     titleText.text = "Sell";
+                }
+            }
+        }
+        private void logToggleValueChanged(bool isOn)
+        {
+            if (isOn)
+            {
+                if (!_isMyLogsToggleOn)
+                {
+                    _isHomeToggleOn = false;
+                    _isBuyToggleOn = false;
+                    _isSellToggleOn = false;
+                    _isMyAuctionsToggleOn = false;
+                    _isMyLogsToggleOn = true;
+
+                    buyItemParent.Clear();
+                    auctionItemParent.Clear();
+
+                    GetLogsData(10, null);
+
+                    titleText.text = "Logs";
                 }
             }
         }
@@ -204,6 +236,7 @@ namespace Bitszer
                     _isBuyToggleOn = false;
                     _isSellToggleOn = false;
                     _isMyAuctionsToggleOn = true;
+                    _isMyLogsToggleOn = false;
 
                     buyItemParent.Clear();
                     sellItemParent.Clear();
@@ -260,6 +293,25 @@ namespace Bitszer
                 }
 
                 StartCoroutine(PopulateSellData(result));
+            }));
+        }
+        public void GetLogsData(int limit, string nextToken)
+        {
+            AuctionHouse dataProvider = AuctionHouse.Instance;
+            APIManager.Instance.RaycastBlock(true);
+
+            _logItemsLength = 0;
+
+            StartCoroutine(dataProvider.GetMyLogs(limit, nextToken, result =>
+            {
+                if (result == null)
+                {
+                    APIManager.Instance.SetError("Something went wrong!", "Okay", ErrorType.CustomMessage);
+                    APIManager.Instance.RaycastBlock(false);
+                    return;
+                }
+
+                StartCoroutine(PopulateLogData(result));
             }));
         }
 
@@ -620,6 +672,46 @@ namespace Bitszer
             else
             {
                 _sellItemsLength = 0;
+                APIManager.Instance.RaycastBlock(false);
+            }
+        }
+        
+        private IEnumerator PopulateLogData(GetMyLogs getMyLogs)
+        {
+            var count = getMyLogs.data.getMyLogs.logs.Count;
+            if (count <= 0)
+            {
+                APIManager.Instance.RaycastBlock(false);
+                yield break;
+            }
+
+            var item = getMyLogs.data.getMyLogs.logs[_logItemsLength];
+            GameObject go = Instantiate(LogItemPrefab.gameObject, LogItemParent);
+            var LogItem = go.GetComponent<LogItem>();
+            StartCoroutine(APIManager.Instance.GetImageFromUrl(item.auctionItem.gameItem.imageUrl, texture =>
+            {
+                LogItem.itemImage.texture = texture;
+            }));
+            LogItem.ActionName.text = item.action.ToString();
+            LogItem.bid.text = item.auctionItem.bid.ToString();
+            LogItem.buyout.text = item.auctionItem.buyout.ToString();
+            LogItem.createdAt.text = item.auctionItem.createdAt.ToString();
+            LogItem.expiration.text = item.auctionItem.expiration.ToString();
+            LogItem.quantity.text = item.auctionItem.quantity.ToString();
+            LogItem.gameName.text = item.auctionItem.gameItem.gameName.ToString();
+           // LogItem.highBidderProfile.text = item.auctionItem.highBidderProfile.name.ToString();
+            LogItem.timestamp.text = item.timestamp.ToString();
+
+
+            yield return null;
+
+            _logItemsLength++;
+
+            if (_logItemsLength < count)
+                StartCoroutine(PopulateLogData(getMyLogs));
+            else
+            {
+                _logItemsLength = 0;
                 APIManager.Instance.RaycastBlock(false);
             }
         }
