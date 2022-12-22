@@ -117,7 +117,7 @@ namespace Bitszer
             GraphApi.Query getMyInventorybyGameQuery = graphApi.GetQueryByName("getMyInventorybyGame", GraphApi.Query.Type.Query);
 
             if (string.IsNullOrEmpty(nextToken))
-                getMyInventorybyGameQuery.SetArgs(new { limit, configuration.gameId, });
+                getMyInventorybyGameQuery.SetArgs(new {  configuration.gameId, limit, });
             else
                 getMyInventorybyGameQuery.SetArgs(new { limit, nextToken, configuration.gameId, });
 
@@ -127,6 +127,20 @@ namespace Bitszer
 
             if (data != null)
                 Events.OnMyInventoryByGameReceived.Invoke(data);
+
+            result(data);
+        }
+        public IEnumerator GetMyLogs(int limit, string nextToken, Action<GetMyLogs> result)
+        {
+            GraphApi.Query getMyLogs = graphApi.GetQueryByName("getMyLogs", GraphApi.Query.Type.Query);
+
+            var www = graphApi.Post(getMyLogs);
+            yield return new WaitUntil(() => www.IsCompleted);
+            Debug.Log("Data: " + www.Result.downloadHandler.text);
+            var data = JsonConvert.DeserializeObject<GetMyLogs>(www.Result.downloadHandler.text);
+
+            if (data != null)
+                Events.OnMyLogByGameReceived.Invoke(data);
 
             result(data);
         }
