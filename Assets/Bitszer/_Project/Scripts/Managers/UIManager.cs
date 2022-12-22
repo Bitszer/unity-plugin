@@ -148,6 +148,7 @@ namespace Bitszer
 
                     buyItemParent.Clear();
                     sellItemParent.Clear();
+                    LogItemParent.Clear();
                     auctionItemParent.Clear();
 
                     titleText.text = "Home";
@@ -172,6 +173,7 @@ namespace Bitszer
 
                     sellItemParent.Clear();
                     auctionItemParent.Clear();
+                    LogItemParent.Clear();
 
                     titleText.text = "Buy";
 
@@ -197,6 +199,7 @@ namespace Bitszer
 
                     buyItemParent.Clear();
                     auctionItemParent.Clear();
+                    LogItemParent.Clear();
 
                     GetSellData(10, null);
 
@@ -218,6 +221,7 @@ namespace Bitszer
 
                     buyItemParent.Clear();
                     auctionItemParent.Clear();
+                    LogItemParent.Clear();
 
                     GetLogsData(10, null);
 
@@ -240,6 +244,7 @@ namespace Bitszer
 
                     buyItemParent.Clear();
                     sellItemParent.Clear();
+                    LogItemParent.Clear();
 
                     GetMyAuctionsData(10, null);
 
@@ -685,6 +690,8 @@ namespace Bitszer
                 yield break;
             }
 
+            _nextToken = getMyLogs.data.getMyLogs.nextToken;
+
             var item = getMyLogs.data.getMyLogs.logs[_logItemsLength];
             GameObject go = Instantiate(LogItemPrefab.gameObject, LogItemParent);
             var LogItem = go.GetComponent<LogItem>();
@@ -699,7 +706,7 @@ namespace Bitszer
             LogItem.expiration.text = item.auctionItem.expiration.ToString();
             LogItem.quantity.text = item.auctionItem.quantity.ToString();
             LogItem.gameName.text = item.auctionItem.gameItem.gameName.ToString();
-           // LogItem.highBidderProfile.text = item.auctionItem.highBidderProfile.name.ToString();
+         // LogItem.highBidderProfile.text = item.auctionItem.highBidderProfile.name.ToString();
             LogItem.timestamp.text = item.timestamp.ToString();
 
 

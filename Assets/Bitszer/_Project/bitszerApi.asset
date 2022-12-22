@@ -3778,11 +3778,11 @@ MonoBehaviour:
     isComplete: 1
   - name: getMyInventorybyGame
     type: 0
-    query: "query getMyInventorybyGame{\n    getMyInventorybyGame(  limit :10, gameId
-      :\"01FYCY9CE00XVMFD3PJ8EGVMF0\" ){\n        nextToken\n        inventory{\n           
-      username\n            ItemCount\n            gameItem{\n                itemId\n               
-      gameName\n                itemName\n                imageUrl\n               
-      description\n            }\n        }\n    }\n}"
+    query: "query getMyInventorybyGame{\n    getMyInventorybyGame(  gameId :\"01FYCY9CE00XVMFD3PJ8EGVMF0\",
+      limit :10 ){\n        nextToken\n        inventory{\n            username\n           
+      ItemCount\n            gameItem{\n                itemId\n                gameName\n               
+      itemName\n                imageUrl\n                description\n           
+      }\n        }\n    }\n}"
     queryString: getMyInventorybyGame
     returnType: InventoryPage
     queryOptions:

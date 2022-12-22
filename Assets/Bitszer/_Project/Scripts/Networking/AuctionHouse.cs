@@ -117,7 +117,7 @@ namespace Bitszer
             GraphApi.Query getMyInventorybyGameQuery = graphApi.GetQueryByName("getMyInventorybyGame", GraphApi.Query.Type.Query);
 
             if (string.IsNullOrEmpty(nextToken))
-                getMyInventorybyGameQuery.SetArgs(new { limit, configuration.gameId, });
+                getMyInventorybyGameQuery.SetArgs(new {  configuration.gameId, limit, });
             else
                 getMyInventorybyGameQuery.SetArgs(new { limit, nextToken, configuration.gameId, });
 
