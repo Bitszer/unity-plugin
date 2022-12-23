@@ -108,6 +108,7 @@ namespace Bitszer
                         }
                     }));
 
+                    uiManager.loginSuccessfullPanel.gameObject.SetActive(true);
                     APIManager.Instance.RaycastBlock(false);
                     uiManager.OpenTabPanel();
 
@@ -179,6 +180,7 @@ namespace Bitszer
 
                 signupErrorText.color = Color.green;
                 signupErrorText.SetText("Registered successfully!\nYou can Login now.");
+                uiManager.signupSuccessfullPanel.gameObject.SetActive(true);
                 signupErrorText.gameObject.SetActive(true);
 
                 APIManager.Instance.RaycastBlock(false);
