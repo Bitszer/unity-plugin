@@ -26,7 +26,9 @@ namespace Bitszer
         [Space]
         [Space]
         public GameObject loginPanel;
+        public GameObject loginSuccessfullPanel;
         public GameObject signupPanel;
+        public GameObject signupSuccessfullPanel;
         public GameObject tabPanel;
         public GameObject sellItemPanel;
         public GameObject itemDescPopup;
@@ -1087,6 +1089,8 @@ namespace Bitszer
         {
             loginPanel.SetActive(true);
             signupPanel.SetActive(false);
+            loginSuccessfullPanel.SetActive(false);
+            signupSuccessfullPanel.SetActive(false);
             tabPanel.SetActive(false);
         }
 
@@ -1095,6 +1099,8 @@ namespace Bitszer
         {
             signupPanel.SetActive(true);
             loginPanel.SetActive(false);
+            loginSuccessfullPanel.SetActive(false);
+            signupSuccessfullPanel.SetActive(false);
             tabPanel.SetActive(false);
         }
 
@@ -1102,9 +1108,18 @@ namespace Bitszer
         {
             signupPanel.SetActive(false);
             loginPanel.SetActive(false);
+            loginSuccessfullPanel.SetActive(false);
+            signupSuccessfullPanel.SetActive(false);
             tabPanel.SetActive(true);
         }
 
+        public void CloseSuccessfullPanel()
+        {
+            signupPanel.SetActive(false);
+            loginPanel.SetActive(false);
+            loginSuccessfullPanel.SetActive(false);
+            signupSuccessfullPanel.SetActive(false);
+        }
         // Assigned to "ReturnToGameButton" in the inspector
         public void CloseAuctionHouse()
         {
