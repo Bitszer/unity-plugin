@@ -127,6 +127,9 @@ namespace Bitszer
             if (!string.IsNullOrEmpty(_nextToken) && scrollPanel.Equals(ScrollController.SCROLL_PANEL.MY_AUCTIONS))
                 GetMyAuctionsData(10, _nextToken);
 
+            if (!string.IsNullOrEmpty(_nextToken) && scrollPanel.Equals(ScrollController.SCROLL_PANEL.MY_LOGS))
+                GetLogsData(10, _nextToken);
+
             if (!string.IsNullOrEmpty(_nextToken) && scrollPanel.Equals(ScrollController.SCROLL_PANEL.SIMILAR_ITEMS))
                 GetBuyData("", 10, _nextToken);
 
@@ -325,7 +328,9 @@ namespace Bitszer
         public void GetMyAuctionsData(int limit, string nextToken)
         {
             AuctionHouse dataProvider = AuctionHouse.Instance;
-            APIManager.Instance.RaycastBlock(true);
+            if (nextToken != null)
+                APIManager.Instance.RaycastBlock(true);
+            
 
             _myAuctionsLength = 0;
 
@@ -340,6 +345,7 @@ namespace Bitszer
 
                 StartCoroutine(PopulateGetUserAuctionsData(result));
             }));
+
         }
 
         public void GetSearchItemsData(string itemName, int limit, string nextToken)
@@ -704,12 +710,30 @@ namespace Bitszer
             LogItem.ActionName.text = item.action.ToString();
             LogItem.bid.text = item.auctionItem.bid.ToString();
             LogItem.buyout.text = item.auctionItem.buyout.ToString();
-            LogItem.createdAt.text = item.auctionItem.createdAt.ToString();
-            LogItem.expiration.text = item.auctionItem.expiration.ToString();
+
+
+            string[] CreatedWords = item.auctionItem.createdAt.ToString().Split('T');
+            DateTime CreatedDateTime = DateTime.Parse(CreatedWords[0]);
+            string[] CreatedTimeString = CreatedWords[1].Split('.');
+            string CreatedFinalString = CreatedDateTime.ToString("MMMM") + " " + CreatedDateTime.Day + "," + CreatedDateTime.Year + " " + CreatedTimeString[0];
+            LogItem.createdAt.text = CreatedFinalString;
+
+            string[] ExpireWords = item.auctionItem.expiration.ToString().Split('T');
+            DateTime ExpireDateTime = DateTime.Parse(ExpireWords[0]);
+            string[] ExpireTimeString = ExpireWords[1].Split('.');
+            string ExpireFinalString = ExpireDateTime.ToString("MMMM") + " " + ExpireDateTime.Day + "," + ExpireDateTime.Year + " " + ExpireTimeString[0];
+            LogItem.expiration.text = ExpireFinalString;
+
             LogItem.quantity.text = item.auctionItem.quantity.ToString();
             LogItem.gameName.text = item.auctionItem.gameItem.gameName.ToString();
-         // LogItem.highBidderProfile.text = item.auctionItem.highBidderProfile.name.ToString();
-            LogItem.timestamp.text = item.timestamp.ToString();
+            // LogItem.highBidderProfile.text = item.auctionItem.highBidderProfile.name.ToString();
+
+
+            string[] TimeStampWords = item.timestamp.ToString().Split('T');
+            DateTime TimeStampDateTime = DateTime.Parse(TimeStampWords[0]);
+            string[] TimeStampTimeString = TimeStampWords[1].Split('.');
+            string TimeStampFinalString = TimeStampDateTime.ToString("MMMM") + " " + TimeStampDateTime.Day + "," + TimeStampDateTime.Year + " " + TimeStampTimeString[0];
+            LogItem.timestamp.text = TimeStampFinalString;
 
 
             yield return null;
@@ -728,7 +752,6 @@ namespace Bitszer
         private IEnumerator PopulateGetUserAuctionsData(GetUserAuction getUserAuctions)
         {
             var count = getUserAuctions.data.getUserAuctions.auctions.Count;
-
             if (count <= 0)
             {
                 APIManager.Instance.RaycastBlock(false);
